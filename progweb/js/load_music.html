@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TP 1 - EX 5 : Bouton de chargement et musique</title>
+		
+		<meta charset="utf-8">
+		
+		<style>
+			html, body {
+				margin: 0;
+				padding: 0;
+			}
+
+			html {
+				font-size: 12px;
+				background-color: #7cbbda;
+			}
+
+			body {
+				width: 70%;
+				margin: 0 auto;
+			}
+
+			h1, h2, h3 {
+				font-family: 'Olde English';
+				color: #2a2a2a;
+			}
+			
+			h1 {
+				font-size: 4rem;
+			}
+			
+			p {
+				font-family: 'Bahnschrift';
+				color: #2a2a2a;
+				font-size: 2rem;
+			}
+
+			#mogolo {
+				position: absolute;
+				bottom: 0;
+				background-color: transparent;
+			}
+
+			#mogolo img {
+				float:left;
+			}
+
+			#mogolo p {
+				float:right;
+			}
+
+			.sans-speak {
+				font-family: 'Comic Sans MS';
+				color: #000;
+				position: absolute;
+				bottom: 100px;
+				right: 300px;
+			}
+		</style>
+		
+		<script>
+			var audio;
+			var canPlay = false;
+			var canvas;
+			var ctx;
+			
+			var footerCanvas;
+			var footerCtx;
+			var img;
+			var imgW = 428;
+			var imgH = 193;
+			var dir = +3;
+			var off = 0;
+			var max = 30;
+			
+			function init(){
+				canvas = document.getElementById('myCanvas');
+				ctx = canvas.getContext('2d');
+				
+				footerCanvas = document.getElementById('sanessss');
+				footerCtx = footerCanvas.getContext('2d');
+				img = new Image(imgW, imgH);
+				img.src = "coucou.png";
+				
+				document.getElementById('play').onclick=play;
+				document.getElementById('pause').onclick=pause;
+				document.getElementById('stop').onclick=stop;
+				
+				audio = new Audio("./mogolovonio.mp3");
+				audio.addEventListener("timeupdate", updateCanvas);
+				audio.addEventListener("timeupdate", updateCanvas2);
+				
+				audio.addEventListener("canplaythrough", event => {canPlay = true;});
+			}
+			
+			function play(){
+				if(canPlay) {
+					audio.play();
+				}
+				else {
+					alert("le media n'a pas assez chargé");
+				}
+			}
+			
+			function pause() {
+				audio.pause();
+			}
+			
+			function stop(){
+				audio.pause();
+				audio.currentTime = 0.0;
+			}
+			
+			function updateCanvas(){
+				let w = canvas.width;
+				let h = canvas.height;
+				
+				let x = w/2.0;
+				let y = h/2.0;
+				
+				let rOut = (w/2.0) * 2.0/3.0;
+				let rIn = rOut - 5;
+				let p = audio.currentTime / audio.duration;
+				
+				ctx.clearRect(0, 0, w, h);
+
+				ctx.fillStyle = "#7cbbda";
+				ctx.fillRect(0, 0, w, h);
+				
+				ctx.fillStyle = "black";
+				ctx.beginPath();
+				ctx.arc(x, y, rOut, 0, p * 2.0*Math.PI);
+				ctx.fill();
+				
+				ctx.fillStyle = "#7cbbda";
+				ctx.beginPath();
+				ctx.arc(x, y, rIn, 0, 2.0*Math.PI);
+				ctx.fill();
+			}
+			
+			function updateCanvas2(){
+				footerCtx.fillStyle = "#7cbbda";
+				footerCtx.clearRect(0, 0, footerCanvas.width, footerCanvas.height);
+				footerCtx.drawImage(img, 0, footerCanvas.height-imgH+off)
+				
+				off += dir;
+				if(off > max){
+					dir = -3;
+				}
+				else if(off < 0){
+					dir = +3;
+				}
+				
+				// TODO deux cercles avec fill pour avoir de la largeur
+			}
+		</script>
+	</head>
+
+	<body onload="init()">
+		<h1>Mogolovonio.mp3</h1>
+		<span>
+			<p>composé par l'illustre <a href="https://www.youtube.com/watch?v=JtlEcTqUNCM" target="_blank" style="color: red;">Sr Pelo</a> (attention spoilers Undertale)</p>
+			<p>Faites rouler la molette pour plus de fun !</p>
+		</span>
+		
+		<div class="main">
+			<canvas id="myCanvas" width="200" height="200"></canvas>
+			
+			<span id="navlist">
+				<button id="play">Play</button>
+				<button id="pause">Pause</button>
+				<button id="stop">Stop</button>
+				<!--<progress id="progressBar" max="100" value="70"> 70% </progress>-->
+			</span>
+		</div>
+
+		<p class="sans-speak">Do U WanNA HaVe a <b>BAD</b> T&#8709;M ?!!?!</p>
+		
+		<div id="mogolo">
+			<canvas id="sanessss" width="500" height="200"></canvas>
+		</div>
+	</body>
+</html>
