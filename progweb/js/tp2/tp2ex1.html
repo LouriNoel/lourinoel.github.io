@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<!-- toujours utiliser === car valeur et type (== que valuation) -->
+	<head>
+		<title>TP 2 - EX 1</title>
+		
+		<meta charset="utf-8">
+		
+		<style>
+		</style>
+		
+		<script>
+			var count = 10;
+			var intervalID = -1;
+			
+			function init(){
+				display = document.getElementById('display');
+				display.textContent = count;
+				intervalID = setInterval(decrTimer, 1000); // func, millis, args
+			}
+			
+			function decrTimer(){
+				count--;
+				display.textContent = count;
+				if(count === 0){
+					window.clearInterval(intervalID);
+				}
+			}
+		</script>
+	</head>
+
+	<body onload="init()">
+		<p id="display"></p>
+	</body>
+</html>

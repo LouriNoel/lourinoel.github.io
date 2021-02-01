@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<!-- toujours utiliser === car valeur et type (== que valuation) -->
+	<head>
+		<title>TP 2 - EX 1</title>
+		
+		<meta charset="utf-8">
+		
+		<style>
+			html {
+				background-color: #7cbbda;
+			}
+			
+			#canvas {
+				outline: black 3px solid;
+			}
+		</style>
+		
+		<script>
+			class Carre {
+				constructor(ctx, size, x, y, speed, color, delay) {
+					this.ctx = ctx;
+					this.size = size;
+					this.x = x;
+					this.y = y;
+					this.speed = speed;
+					this.color = color;
+					this.delay = delay;
+					this.elapsed = 0;
+				}
+				
+				update(dt){
+					this.elapsed += dt;
+					if(this.elapsed >= this.delay && this.x + this.size < this.ctx.canvas.width){
+						this.x += this.speed;
+						if(this.x + this.size > this.ctx.canvas.width){
+							this.x = this.ctx.canvas.width - this.size;
+						}
+					}
+				}
+			
+				draw(){
+					this.ctx.beginPath();
+					this.ctx.fillStyle = this.color;
+					this.ctx.rect(this.x, this.y, this.size, this.size);
+					this.ctx.fill();
+					this.ctx.closePath();
+				}
+			}
+			
+			var intervalID = -1;
+			var canvas;
+			var ctx;
+			
+			var carre1;
+			var carre2;
+			var carre3;
+			
+			function init(){
+				canvas = document.getElementById('canvas');
+				ctx = canvas.getContext('2d');
+				
+				h = canvas.height;
+				
+				carre1 = new Carre(ctx, 50, 0, h/4, 10, "red", 4000);
+				carre2 = new Carre(ctx, 50, 0, h/2, 10, "green", 4000+1000);
+				carre3 = new Carre(ctx, 50, 0, h*3/4, 10, "blue", 4000+2000);
+				
+				render();
+				
+				intervalID = setInterval(loop, 100, 100);
+			}
+			
+			function loop(dt){
+				update(dt);
+				render();
+			}
+			
+			function update(dt){
+				carre1.update(dt);
+				carre2.update(dt);
+				carre3.update(dt);
+			}
+			
+			function render(){
+				ctx.fillStyle = "white";
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				
+				carre1.draw();
+				carre2.draw();
+				carre3.draw();
+			}
+		</script>
+	</head>
+
+	<body onload="init()">
+		<canvas id="canvas" width="600" height="600"></canvas>
+	</body>
+</html>

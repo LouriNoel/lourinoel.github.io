@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<!-- toujours utiliser === car valeur et type (== que valuation) -->
+	<head>
+		<title>TP 2 - EX 1</title>
+		
+		<meta charset="utf-8">
+		
+		<style>
+			html {
+				background-color: #7cbbda;
+			}
+			
+			#canvas {
+				outline: black 3px solid;
+			}
+		</style>
+		
+		<script>
+			class Carre {
+				constructor(size) {
+					this.size = size;
+				}
+				
+				setPosition(x, y){
+					this.x = x;
+					this.y = y;
+				}
+				
+				setColor(color){
+					this.color = color;
+				}
+				
+				update(dt){
+					this.x += 10;
+				}
+			
+				render(ctx){
+					ctx.beginPath();
+					ctx.fillStyle = this.color;
+					ctx.rect(this.x, this.y, this.size, this.size);
+					ctx.fill();
+					ctx.closePath();
+				}
+			}
+			
+			var intervalID = -1;
+			
+			var canvas;
+			var ctx;
+			var carre;
+			
+			function init(){
+				canvas = document.getElementById('canvas');
+				ctx = canvas.getContext('2d');
+				carre = new Carre(50);
+				carre.setPosition(0, canvas.height/2 - carre.size/2);
+				carre.setColor("red");
+				
+				render(ctx);
+				intervalID = setInterval(loop, 100, 100); // func, millis, no args
+			}
+			
+			function loop(dt){
+				update(dt);
+				render(ctx);
+			}
+			
+			function update(dt){
+				carre.update(dt);
+				
+				if(carre.x+carre.size >= canvas.width){
+					carre.x = canvas.width - carre.size;
+					window.clearInterval(intervalID);
+				}
+			}
+			
+			function render(ctx){
+				ctx.fillStyle = "white";
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				carre.render(ctx);
+			}
+		</script>
+	</head>
+
+	<body onload="init()">
+		<canvas id="canvas" width="600" height="600"></canvas>
+	</body>
+</html>

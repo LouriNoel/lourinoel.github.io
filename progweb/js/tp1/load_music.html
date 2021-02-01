@@ -129,14 +129,22 @@
 				ctx.fillRect(0, 0, w, h);
 				
 				ctx.fillStyle = "black";
+				
+				// ou encore ctx.lineWidth = 2;  ???
+				
 				ctx.beginPath();
+				ctx.moveTo(x, y);
+				ctx.lineTo(x+rOut, y);
 				ctx.arc(x, y, rOut, 0, p * 2.0*Math.PI);
+				ctx.lineTo(x, y);
 				ctx.fill();
+				ctx.closePath();
 				
 				ctx.fillStyle = "#7cbbda";
 				ctx.beginPath();
 				ctx.arc(x, y, rIn, 0, 2.0*Math.PI);
 				ctx.fill();
+				ctx.closePath();
 			}
 			
 			function updateCanvas2(){
