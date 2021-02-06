@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
-	<!-- toujours utiliser === car valeur et type (== que valuation) -->
 	<head>
-		<title>TP 2 - EX 1</title>
-		
+		<title>Accueil</title>
 		<meta charset="utf-8">
+		<base href="../../index.html"/>
+		<link rel="stylesheet" type="text/css" href="style.css">
 		
 		<style>
+			#display {
+				text-align: center;
+			}
 		</style>
 		
 		<script>
 			var count = 10;
 			var intervalID = -1;
 			
-			function init(){
+			function main(){
 				display = document.getElementById('display');
 				display.textContent = count;
 				intervalID = setInterval(decrTimer, 1000); // func, millis, args
@@ -29,7 +32,29 @@
 		</script>
 	</head>
 
-	<body onload="init()">
-		<p id="display"></p>
+	<body onload="main()">
+		<header>
+			<h1>Site de Louri</h1>
+		</header>
+
+		<nav class="flex-list">
+			<ul>
+				<li><a href="js/index_js.html">Javascript</a></li>
+				<li><a href="index.html">Accueil</a></li>
+			</ul>
+		 </nav>
+
+		 <main>
+			<article>
+				<div class="article-body">
+					<p id="display"></p>
+				</div>
+			</article>
+		</main>
+
+		<footer>
+			<p>©Copyright: All Rights Reserved</p>
+		</footer>
+
 	</body>
 </html>
