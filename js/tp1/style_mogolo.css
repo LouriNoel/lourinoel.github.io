@@ -1,0 +1,47 @@
+.get-dunked-on {
+	font-family: 'Bahnschrift';
+	font-size: 2rem;
+}
+
+h4 {
+	font-family: 'Olde English';
+	font-size: 3rem;
+	text-align: center;
+	padding-top: 0px;
+	margin-top: 0px;
+}
+
+.chara {
+	display: flex;
+	flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chara div {
+	flex: 1;
+}
+
+#bones button {
+	font-size: 2rem;
+}
+
+#last-corridor {
+	display: flex;
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+
+.temmie {
+	display: inline;
+	flex: 1;
+}
+
+.sans-speak {
+	font-family: 'Comic Sans MS';
+	font-size: 2rem;
+}
+
+.mini {
+	font-size: 1rem;
+}
