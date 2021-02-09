@@ -95,8 +95,12 @@ footer {
 }
 
 a {
-	color: black;
+	color: blue;
 	text-decoration: none;
+}
+
+nav a {
+	color: black;
 }
 
 .pretty-button {
@@ -104,4 +108,5 @@ a {
 	text-decoration: none;
 	padding: 20px;
 	border-radius: 10px;
+	color: black;
 }
