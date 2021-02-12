@@ -68,8 +68,6 @@
 				}
 			}
 			
-			var intervalID = -1;
-			
 			var canvas;
 			var ctx;
 			
@@ -114,7 +112,7 @@
 			function handleWorkerMessage(msg){
 				let data = JSON.parse(msg.data);
 				
-				// zone qui sera a effacer : ancienne position du spot
+				// zone qui sera à effacer : ancienne position du spot
 				let bbox = spots[data.id].bbox.copy();
 				
 				// update
