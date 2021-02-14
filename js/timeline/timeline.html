@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>KnightLab Timeline</title>
+		<meta charset="utf-8">
+		<base href="../../index.html"/>
+		
+		<link title="timeline-styles" rel="stylesheet" href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css">
+        <link title="timeline-styles" rel="stylesheet" href="https://cdn.knightlab.com/libs/timeline3/latest/css/fonts/font.pt.css">
+        
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+
+	<body>
+		<header>
+			<h1>Site de Louri</h1>
+		</header>
+
+		<nav class="flex-list">
+			<ul>
+				<li><a href="js/index_js.html">Javascript</a></li>
+				<li><a href="python/index_python.html">Python</a></li>
+				<li><a href="index.html">Accueil</a></li>
+			</ul>
+		 </nav>
+
+		 <main>
+			<article>
+				<div class="article-body">
+					<p>Dans l'objectif d'afficher ses timelines de cours correctement, j'ai fait l'intégration de KnightLab Timeline pour ma soeur.
+					J'y ai ajouté une surprise, en jouant une musique lorsqu'un certain élément de la timeline apparaît (en cliquant ou en appuyant sur les flèches directionnelles).
+					Ça se passe en 1921.</p>
+					<div id='timeline-embed' style="width: 100%; height: 450px"></div>
+				</div>
+			</article>
+		</main>
+
+		<footer>
+			<p>©Copyright: KnightLab Timeline pour la mise en forme, À ma soeur pour la timeline, L'hymne communiste bien entendu n'appartient à personnne et est partagé par tous comme le veut la mère patrie, website by me.</p>
+		</footer>
+	</body>
+	
+	<script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+
+	<script type="text/javascript">
+		var audio = new Audio('js/timeline/hymne_URSS.mp3');
+		audio.loop = true;
+		
+		var additionalOptions = {
+			language:"fr"
+		};
+			
+		timeline = new TL.Timeline('timeline-embed','https://docs.google.com/spreadsheets/d/1-xLTGESIRdxaRtktHwMTlwt236iV7AgWRN9dMFeAUVU/pubhtml', additionalOptions);
+		
+		timeline.on("change", function(e){
+			if(e.unique_id == "fondation-du-parti-communiste-chinois"){
+				audio.play();
+			}
+			else{
+				audio.pause();
+			}
+		});
+	</script>
+</html>
