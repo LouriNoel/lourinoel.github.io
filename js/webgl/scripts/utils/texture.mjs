@@ -1,43 +1,31 @@
-// Initialise une texture et charge une image.
-// Quand le chargement d'une image est terminé, la copie dans la texture.
+// Charge une texture.
+// L'initialise à une texture par défaut en attendant que le chargement soit terminé.
 export function loadTexture(gl, url) {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    // Du fait que les images doivent être téléchargées depuis l'internet,
-    // il peut s'écouler un certain temps avant qu'elles ne soient prêtes.
-    // Jusque là, mettre une texture temporaire, de sorte que nous puissions
-    // l'utiliser immédiatement. Quand le téléchargement de la page sera terminé,
-    // nous mettrons à jour la texture avec le contenu de l'image.
-    const level = 0;
-    const internalFormat = gl.RGBA;
+    // texture temporaire le temps que le chargement soit terminé
     const width = 2;
     const height = 2;
-    const border = 0;
-    const srcFormat = gl.RGBA;
-    const srcType = gl.UNSIGNED_BYTE;
     const pixels = new Uint8Array([
         255,   0, 255, 255,
           0,   0,   0, 255,
           0,   0,   0, 255,
         255,   0, 255, 255]);
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, border, srcFormat, srcType, pixels);
+    // cible, level, internalFormat, width, height, border, srcFormat, srcType, pixels
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
     const image = new Image();
-    image.onload = function() {
+    image.onload = () => {
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
-        // WebGL1 a des spécifications différentes pour les images puissances de 2
-        // par rapport aux images non puissances de 2 ; aussi vérifier si l'image est une
-        // puissance de 2 sur chacune de ses dimensions.
+        // WebGL1 : spécificités selon dimensions puissances de 2 ou non.
         if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-            // Oui, c'est une puissance de 2. Générer les mips.
-            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.generateMipmap(gl.TEXTURE_2D); // générer des mipmaps
         } else {
-            // Non, ce n'est pas une puissance de 2. Désactiver les mips et définir l'habillage
-            // comme "accrocher au bord"
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); // repeat texture
+            // Désactiver les mips et activer la répétition de la texture
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         }
@@ -47,6 +35,7 @@ export function loadTexture(gl, url) {
     return texture;
 }
 
+// Renvoie true si l'entier est une puissance de 2
 function isPowerOf2(s) {
     return (s & (s - 1)) === 0;
 }
