@@ -40,8 +40,12 @@ class Keyboard {
      */
     handler(event, pressed) {
         let keycode = (event.key !== undefined) ? event.key : event.keyCode;
-        if(!event.repeat && keycode in this.mapped){
-            this[this.mapped[keycode]] = pressed;
+        if(keycode in this.mapped){
+            if(!event.repeat){
+                this[this.mapped[keycode]] = pressed;
+            }
+
+            // outside repeat
             event.preventDefault(); // prevent the event from being used again.
         }
     }
