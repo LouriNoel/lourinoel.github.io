@@ -2,13 +2,12 @@ import * as vec3 from "../lib/gl-matrix/vec3.js";
 import * as mat4 from "../lib/gl-matrix/mat4.js";
 
 import {loadGLSL, initShaderProgram} from "./utils/glsl.mjs";
-import {loadTexture} from "./utils/texture.mjs";
-import {Spritesheet} from "./utils/spritesheet.mjs";
 import {Controller} from "./controller.mjs";
 import {Camera} from "./camera.mjs";
 import {Dice} from "./entities/dice.mjs";
 
 // https://developer.mozilla.org/fr/docs/Web/API/WebGL_API/Tutorial
+// https://webglfundamentals.org/
 
 // TODO https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 
@@ -27,10 +26,13 @@ class Game {
         this.gl = gl;
 
         this.controller = new Controller(this.canvas);
+        // https://developer.mozilla.org/fr/docs/Web/API/KeyboardEvent/key/Key_Values
+        this.controller.keyboard.map("forward", "ArrowUp");
+        this.controller.keyboard.map("backward", "ArrowDown");
         this.controller.keyboard.map("right", "ArrowRight");
-        this.controller.keyboard.map("up", "ArrowUp");
         this.controller.keyboard.map("left", "ArrowLeft");
-        this.controller.keyboard.map("down", "ArrowDown");
+        this.controller.keyboard.map("up", " "); // spacebar
+        this.controller.keyboard.map("down", "Shift"); // spacebar
         this.controller.keyboard.map("pause", "p");
 
         //this.controller.mouse.lock();
@@ -59,7 +61,7 @@ class Game {
             uniformLocations: {
                 projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
                 modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
-                uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
+                uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'), // if texture
             }
         };
 
@@ -67,9 +69,9 @@ class Game {
         // matrix returned, fov en radian, aspect = canvas width/height, near, far
         mat4.perspective(projectionMatrix, 45 * Math.PI / 180,
             gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
-        const cam_pos = vec3.fromValues(0.0, 0.0, 9.0); // Z = +9.0
+        const cam_pos = vec3.fromValues(19.0, 0.0, 0.0); // Z = +9.0
         const cam_target = vec3.create(); // (0.0, 0.0, 0.0) to origin
-        const cam_vert = vec3.fromValues(0.0, 1.0, 0.0); // Y axis
+        const cam_vert = vec3.fromValues(0.0, 0.0, 1.0); // Z axis
         this.camera = new Camera(projectionMatrix, cam_pos, cam_target, cam_vert);
 
         Dice.Init(gl);
@@ -137,15 +139,24 @@ class Game {
             this.camera.translate(vec3.scale(temp, this.camera.side, -0.1));
         }
 
-        if(this.controller.keyboard["up"]){
+        if(this.controller.keyboard["forward"]){
             let temp = vec3.create();
             this.camera.translate(vec3.scale(temp, this.camera.forward, 0.1));
-        } else if(this.controller.keyboard["down"]){
+        } else if(this.controller.keyboard["backward"]){
             let temp = vec3.create();
             this.camera.translate(vec3.scale(temp, this.camera.forward, -0.1));
         }
 
-        this.dice.rotate([0.0, 0.7*dt, dt]);
+        if(this.controller.keyboard["up"]){
+            let temp = vec3.create();
+            this.camera.translate(vec3.scale(temp, this.camera.vertical, 0.1));
+        } else if(this.controller.keyboard["down"]){
+            let temp = vec3.create();
+            this.camera.translate(vec3.scale(temp, this.camera.vertical, -0.1));
+        }
+
+        let rot = vec3.fromValues(0.0, 0.7, 1.0);
+        this.dice.rotate(vec3.normalize(rot, rot), dt);
     }
 
     /**
@@ -161,7 +172,7 @@ class Game {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // efface le tampon de couleur et de profondeur
 
         const projectionMatrix = this.camera.projMat;
-        let modelViewMatrix = this.camera.look();
+        let modelViewMatrix = this.camera.lookAt();
 
         const saved_modelViewMatrix = mat4.clone(modelViewMatrix);
 

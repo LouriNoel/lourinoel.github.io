@@ -38,7 +38,7 @@ export class Camera {
      * Get the modelview matrix resulting from a call to mat4.lookAt with the camera's attributes.
      * @return {mat4} the modelview matrix
      */
-    look() {
+    lookAt() {
         return mat4.lookAt(mat4.create(), this.position, this.target, this.vertical);
     }
 
