@@ -1,7 +1,5 @@
 var id;
 
-var intervalID = -1;
-
 var range;
 
 onmessage = msg => {
@@ -13,16 +11,18 @@ onmessage = msg => {
 	else if(data.header === "launch"){
 		range = data.range;
 		
-		let delay = Math.floor(1000 * Math.random());
-		
-		setTimeout(() => {
-			intervalID = setInterval(sendCoords, 1000);
-		}, delay);
+		callback();
 	}
+}
+
+function callback() {
+	sendCoords();
+	setTimeout(callback, 0.5+Math.floor(1000 * Math.random())); // entre 0.5s et 1.5s : moyenne d'une seconde
 }
 
 function sendCoords(){
 	let x = Math.floor(range * Math.random());
 	let y = Math.floor(range * Math.random());
-	postMessage('{"id": ' + id + ', "x": ' + x + ', "y": ' + y + '}');
+	
+	postMessage(JSON.stringify({"id": id, "x": x, "y": y}));
 }
