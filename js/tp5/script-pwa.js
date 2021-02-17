@@ -45,7 +45,11 @@ function init() {
 
 	forgeturlButton.addEventListener("click", () => {
 		localStorage.removeItem("edt_url"); // delete url from web storage
-		window.indexedDB.deleteDatabase(this.db_name); // delete indexed db
+		
+		let transaction = db.transaction([itemTable], 'readwrite');
+		let os = transaction.objectStore(itemTable);
+		os.clear();
+		
 		const li = document.createElement("li");
 		li.textContent = "Aucun emploi du temps n'est sauvegardé.";
 		ul.appendChild(li);
@@ -186,6 +190,7 @@ function displayWholeDatabase() {
 	os.openCursor().onsuccess = function(e) {
 		let cursor = e.target.result;
 		if(cursor) {
+			console.log(cursor.value);
 			displayItem(cursor.value.id, cursor.value);
 			cursor.continue();
 		} else {
@@ -199,7 +204,11 @@ function displayWholeDatabase() {
 }
 
 async function loadTextFromFile(path) {
-    return await window.fetch(path).then(response => {return response.text();});
+	if(path.substring(0,4) === "http"){
+		return await window.fetch(path).then(response => {return response;});
+	} else {
+		return await window.fetch(path).then(response => {return response.text();});
+	}
 }
 
 function main() {
