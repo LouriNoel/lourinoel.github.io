@@ -1,0 +1,13 @@
+﻿h1{
+	text-align: center;
+}
+
+#content{
+	margin: 0 auto;
+	width: 800px;
+}
+
+p{
+	float: left;
+	max-width: calc((100% - 800px) / 2);
+}

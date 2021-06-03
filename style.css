@@ -11,6 +11,7 @@ html {
 body {
 	width: 80%;
 	margin: 0 auto;
+	padding-bottom: 2em;
 	font-family: 'Bahnschrift';
 	font-size: 1.4rem;
 	line-height: 1.5;

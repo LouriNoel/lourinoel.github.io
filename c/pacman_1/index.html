@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>IA Pacman</title>
+		<meta charset="utf-8">
+		<base href="../../index.html"/>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+
+	<body>
+		<header>
+			<h1>Site de Louri Noël</h1>
+		</header>
+
+		<nav class="flex-list">
+			<ul>
+				<li><a href="index.html">Accueil</a></li>
+			</ul>
+		 </nav>
+
+		 <main>
+			<article>
+				<div class="article-body">
+					<div>
+						<p>Début de première année à l'Enssat, on apprend tout juste le C, on s'exerce en créant l'intelligence artificielle d'un joueur de pacman. Ici, notre IA sait ce qui se trouve sur toutes les cases de la carte.</p>
+						<p>Pas de réseaux de neurones ou quoi que ce soit d'avancé, juste beaucoup de conditions if-else pour bien définir précisément le comportement de l'IA.</p>
+						<p>Objectifs :</p>
+						<ul>
+							<li>1) Manger toutes les pacgums et tous les energyzers (et ainsi gagner au jeu pacman)</li>
+							<li>2) [optionel] Maximiser son score</li>
+						</ul>
+						<p>Mon IA mange en priorité les pacgums de manière méthodique, fuit les fantomes si elle est vulnérable, reste toujours à portée d'un energyzer pour aller le prendre si elle est poursuivie. Quand il ne reste plus beaucoup de pacgums, elle va chercher les energyzers qu'elle a fait exprès de mettre de côté, puis va chasser les fantômes pour maximiser son score. Elle retourne enfin auprès des dernières pacgums avant que le chemin y menant ne devienne dangereux.</p>
+					</div>
+					<div>
+						<figure>
+							<video controls>
+								<source type="video/mp4" src="c/pacman_1/res/last_level.mp4">
+							</video>
+							<figcaption>Mon IA sur le dernier niveau.</figcaption>
+						</figure>
+					</div>
+				</div>
+			</article>
+		</main>
+	</body>
+</html>

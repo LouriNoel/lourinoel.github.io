@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TIPE 1 - Voiture Autonome</title>
+		<meta charset="utf-8">
+		<base href="../../index.html"/>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+
+	<body>
+		<header>
+			<h1>Site de Louri Noël</h1>
+		</header>
+
+		<nav class="flex-list">
+			<ul>
+				<li><a href="index.html">Accueil</a></li>
+			</ul>
+		 </nav>
+
+		 <main>
+			<article>
+				<div class="article-body">
+					<div>
+						<p>Lors de ma 2e année de CPGE (Classes Préparatoires aux Grandes Écoles), mon sujet de TIPE (travail d'initiative personnelle encadré) était inspiré de plusieurs vidéos trouvées sur youtube : des voitures pilotées par un réseau de neurones faisaient la course.</p>
+						<p>Ici, des voitures font la course (entrainement) pour sélectionner la meilleure (la plus proche du prochain checkpoint sur le circuit) et générer la prochaine génération. Plusieurs circuits d'entrainements sont prévus afin d'obtenir un bon réseau. Enfin, on met les voitures dans une "ville" et on regarde s'il y a des collisions ou non. (l'objectif étant qu'il n'y en ait aucune)</p>
+						<p>Les collisions avec le décor sont pixel-perfect grâce à un mask, les collisions entre voitures se font grâce à des OOBB (Object Oriented Bounding Boxes, basiquement des rectangles avec un angle).</p>
+						<p>Chaque voiture est donc définie par sa position, sa largeur et sa longueur (OOBB), la direction, son réseau et les capteurs (il y a plusieurs capteurs : un capteur a une origine relative à la voiture, une direction et une longueur)</p>
+						<p>C'est un projet en binôme en Python utilisant Pygame. Nous n'avons pas utilisé TensorFlow : nous tenions à implémenter le réseau de neurones nous-mêmes.</p>
+						<p>En réalité, malgré l'implémentation qui est générale, le réseau de neurones ne contenait qu'une couche de deux neurones...</p>
+					</div>
+					<div>
+						<figure>
+							<img src="python/neural_network/res/circuit2.PNG">
+							<figcaption>2ème entrainement sur un nouveau circuit, plus que 4 voitures encore en lice.</figcaption>
+						</figure>
+					</div>
+					<div>
+						<figure>
+							<video width="720" controls>
+								<source type="video/mp4" src="python/neural_network/res/ville.mp4">
+							</video>
+							<figcaption>Une fois l'entrainement terminé, test en situation "réelle" dans une "ville".<br/>Les voitures disparaissent lorsqu'elles ont un accident (collision avec un mur ou une autre voiture).<br/>Une voiture peut aussi disparaître si elle est considérée trop lente.</figcaption>
+						</figure>
+					</div>
+				</div>
+			</article>
+		</main>
+	</body>
+</html>

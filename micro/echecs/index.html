@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Microcontroleur</title>
+		<meta charset="utf-8">
+		<base href="../../index.html"/>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<style>
+		pre {
+			 font-size: 12px
+		}
+		</style>
+	</head>
+
+	<body>
+		<header>
+			<h1>Site de Louri Noël</h1>
+		</header>
+
+		<nav class="flex-list">
+			<ul>
+				<li><a href="index.html">Accueil</a></li>
+			</ul>
+		 </nav>
+
+		 <main>
+			<article>
+				<div class="article-body">
+					<div>
+						<h4>Introduction</h4>
+						<p>Il s'agissait de créer une application sur microcontroleur ARM Cortex-M3 utilisant différents périphériques (écran LCD tactile, haut-parleur 1 bit, croix directionelle, mémoire supplémentaire, bluetooth)</p>
+						<p>Nous avons décidé de faire un jeu d'échecs (2D vue du dessus) jouable à deux joueurs (pas d'IA finalement), </p>
+						<p>Nous avons dû activer toutes les options d'optimisation et revoir plusieurs fois notre code afin de ne pas dépasser la limite des 32ko imposée par la version gratuite de Keil µVision. Cela a été notamment de cas pour le stockage des 7 musiques et du modèle 3D des 6 pièces d'échecs.</p>
+						<p>Ce projet a été fait en binôme. Je me suis occupé du moteur 3D et de la musique.</p>
+					</div>
+					<div>
+						<h4>Moteur 3D</h4>
+						<p>Le moteur 3D est très simple. Il ne permet d'afficher qu'un seul modèle 3D à la fois, et uniquement les segments (algorithme de tracé de segment de Bresenham).<br/>
+						   La translation, rotation et le scale est supporté. Une gestion simplifiée de la profondeur a été mise en place (backface culling) afin de ne pas afficher tous les segments d'un modèle, car plus il y a de segments et plus l'écran met du temps à se rafraîchir, résultant en du "flickering".<br/>
+						   Les flottants n'étant pas supportés par le microcontroleur, tous les calculs se font en virgule fixe, à différentes précisions. J'ai dû implémenter les fonctions cosinus et sinus en fonction de cela (développement limité à l'ordre 5 pour des angles entre 0 et pi/2 radians). Les opérateurs sur les bits ont été utilisés le plus possible à la place des divisions et multiplications.</p>
+					</div>
+					<div>
+						<h4>Musique</h4>
+						<p>Le haut-parleur était sur 1 seul bit, tout ou rien : soit il y a du courant (1), soit il n'y en a pas (0). J'ai pourtant réussit à lui faire jouer de la musique multi-piste.<br/>
+						   Dans le principe, il faut réussir à combiner chaque piste afin que les fréquences ne soient pas impactées. Cependant faire un AND, OR ou même un XOR ne rendait pas un bon son. Finalement, pour conserver la période de chaque piste dans la piste finale, chaque montée et chaque descente est convertie en un saut bref (beaucoup de 0 avant, quelques 1, puis beaucoup de 0 après). Par contre, le fait de convertir aussi les descentes fait que la musique finale est une octave trop haute, car ça double la fréquence. Je ne m'en suis pas rendu compte à temps.</p>
+					</div>
+					<div>
+						<figure>
+							<video width="480" height="720" controls>
+								<source type="video/mp4" src="micro/echecs/res/cube.mp4">
+							</video>
+							<figcaption>Essai du moteur 3D avec un cube et l'écran tactile</figcaption>
+						</figure>
+					</div>
+					<div>
+						<figure>
+							<video width="480" height="720" controls>
+								<source type="video/mp4" src="micro/echecs/res/musique.mp4">
+							</video>
+							<figcaption>Démonstration de la musique multi-piste et du moteur 3D (1m45s et 2m25s)<br/>échec / promotion / échec et mat / mat du berger / pat / temps écoulé</figcaption>
+						</figure>
+					</div>
+					
+					<div>
+						<h4>Calcul de cos et sin en virgule fixe</h4>
+						<pre>
+/** Calcul de cos et sin. Fait en meme temps pour réutiliser x^2 et x^4
+ *  Le calcul de cos et de sin s'effectue entre 0 et pi/2 radians dû à la précision du DL5.
+ *  Le résultat de cos et sin est donc positif, en virgule fixe avec 6 bits après la virgule.
+ *
+ *  x,c,s : virgule fixe, 6 bits après la virgule
+ *  angle x positif inférieur à "100" = pi/2 * 64 = 100.5..., on s'arrete a 100 radians
+ *  c,s : pour stocker le cos/sin calculé
+ *  La gestion de l'angle, de cos et de sin doit être fait depuis l'extérieur. */
+void cos_sin(uint32_t x, uint32_t *c, uint32_t *s){
+	uint32_t x2 = x*x; // x au carré, 12 bits après la virgule
+	uint32_t x4 = x2*x2; // x puissance 4, 24 bits après la virgule
+	
+	// cos(X) = 1 - X^2 / 2 + X^4 / 24
+	// 24 = 3*8 et X/8 = X>>3
+	// donc on aurait dû avoir cos(X) = 1 - (X^2 >> 1) + ((X^4 / 3) >> 3)
+	// mais attention à la virgule fixe :
+	// x = f * (1&lt;&lt;6) : 6 bits après la virgule
+	// x2 = x*x = f*f * (1&lt;&lt;6)*(1&lt;&lt;6) = f*f * (1&lt;&lt;12) : 12 bits après la virgule
+	// x4 = x2*x2 = f*f*f*f * (1&lt;&lt;12)*(1&lt;&lt;12) = f*f*f*f * (1&lt;&lt;24) : 24 bits après la virgule
+	// On ne veut qu'additionner et soustraire des nombres en virgule fixe AVEC LE MEME NB DE BITS APRES LA VIRGULE (6 bits)
+	// d'où les ajustements +6, +12 = 2*6, +18 = 3*6
+	*c = (1&lt;&lt;6) - (x2>>(1+6)) + ((x4/3)>>(3+18));
+	
+	// même principe
+	// pour le dernier terme, on divise par 128 au lieu de 120 pour éviter de diviser par 5 (120=2*3*4*5)
+	// l'erreur que cela induit est négligeable.
+	//
+	// attention : les valeurs sont stockées sur 32 bits (2^32 = 4 milliards)
+	// or la valeur maximale de x est 100, et 100^5 = 10 milliards
+	// on ne veut pas passer à des uint64_t juste à cause de ça
+	// donc on scinde le boulot pour le dernier terme en divisant en partie avant
+	*s = x - (((x*x2)/3)>>(1+12)) + ((x*(x4>>12))>>(7+12));
+}
+						</pre>
+
+						<h4>Globales</h4>
+						<pre>
+// La caméra est placée à l'origine et regarde vers les Z positifs.
+// L'axe X va de gauche à droite, l'axe Y va de haut en bas.
+
+// Position de l'écran de projection
+#define ECRAN_PROJ_Z 100
+
+// Redéfinitions des types afin qu'ils soient modifiables facilement pour le débogage.
+typedef int16_t Coord3d; // au minimum int16_t (car int8_t limite a 127)
+typedef uint16_t Coord2d; // car l'écran fait 320 pixels de haut : c'est supérieur à 255
+
+// Coordonnées d'un point en 3D.
+typedef struct {
+	Coord3d x;
+	Coord3d y;
+	Coord3d z;
+} Point3d;
+
+// Coordonnées d'un point en 2D.
+typedef struct {
+	Coord2d x;
+	Coord2d y;
+} Point2d;
+
+// Nombre de sommets maximum que peut avoir un Objet3d.
+// Aussi la taille de bufferObj.
+#define NB_SOMMETS_MAX 66
+// 9*8 = 72 > 66
+#define DEPTH_BUFFER_SIZE 9
+
+// les sommets, aretes, faces_quad (carrées, 4 sommets dans le même plan) et faces_tri (triangulaire) peuvent être partagées
+// entre différentes pièces (car stockage limité), d'où la séparation commun/spécifique.
+
+typedef struct {
+	Point3d *sommets_1; // Sommets communs tels qu'initialisés. Pointeur sur le premier element d'un tableau.
+	uint8_t nb_sommets_1; // Nombre de sommets communs a prendre en compte
+	Point3d *sommets_2; // Sommets spécifiques tels qu'initialisés.
+	uint8_t nb_sommets_2; // Nombre de sommets spécifiques.
+	
+	uint8_t *aretes_1; // Relie les sommets par leur indice. Arêtes communes.
+	uint8_t nb_aretes_1; // en fait, nombre de sommets dans *aretes_1, donc = 2 fois le nombre d'arêtes.
+	uint8_t *aretes_2; // Arêtes spécifiques.
+	uint8_t nb_aretes_2;
+	
+	// faces quadrilateres
+	uint8_t *faces_quad_1; // counter-clockwise pour le backface culling (test de faces cachées). Faces communes.
+	uint8_t nb_faces_quad_1; // en fait, nombre de sommets dans *faces_quad_1, donc = 4 fois le nombre de faces.
+	uint8_t *faces_quad_2; // Faces spécifiques.
+	uint8_t nb_faces_quad_2;
+	
+	// faces triangulaires
+	uint8_t *faces_tri_1; // counter-clockwise pour le backface culling (test de faces cachées). Faces communes.
+	uint8_t nb_faces_tri_1; // en fait, nombre de sommets dans *faces_tri_1, donc = 3 fois le nombre de faces.
+	uint8_t *faces_tri_2; // Faces spécifiques.
+	uint8_t nb_faces_tri_2;
+} Objet3d;
+
+// Stockage des sommets d'un objet pour les traitements intermediaires (translations, rotations, scale).
+Point3d bufferObj[NB_SOMMETS_MAX];
+uint8_t depthBuffer[DEPTH_BUFFER_SIZE]; // bit à 1 si sommet visible, bit à 0 si sommet caché. (caché par défaut)
+Point2d projection[NB_SOMMETS_MAX]; // apres projection 3D => 2D
+						</pre>
+
+						<h4>Chargement d'un modèle dans un buffer sur lequel se feront tous les traitements</h4>
+						<pre>
+void charger_Objet3d(Objet3d *pobj){
+	uint8_t i, j;
+	
+	for(i=0 ; i &lt; pobj->nb_sommets_1 ; i++){
+		bufferObj[i] = pobj->sommets_1[i]; // copie
+	}
+	
+	// i vaut maintenant pobj->nb_sommets_1
+	
+	for(j=0 ; j &lt; pobj->nb_sommets_2 ; j++){
+		bufferObj[i+j] = pobj->sommets_2[j];
+	}
+}
+						</pre>
+						
+						<h4>Scale  selon les 3 coordonnées. Multiplie les coordonnées par k/64</h4>
+						<pre>
+void dilater_Objet3d(Objet3d *pobj, uint8_t k){
+	uint8_t i;
+	uint8_t n = pobj->nb_sommets_1 + pobj->nb_sommets_2; // nb de sommets dans le buffer
+	
+	for(i=0 ; i &lt; n ; i++){
+		bufferObj[i].x *= k;
+		bufferObj[i].y *= k;
+		bufferObj[i].z *= k;
+		
+		bufferObj[i].x /= 64; // signé donc pas de >>
+		bufferObj[i].y /= 64;
+		bufferObj[i].z /= 64;
+	}
+}
+						</pre>
+						
+						<h4>Rotation selon l'axe X</h4>
+						<pre>
+/** c, s : cosinus et sinus (positifs), virgule fixe, 6bits apres la virgule
+ *  ic, is : signe du cosinus et du sinus (si on veut tourner dans l'autre sens.
+ */
+void tourner_X_Objet3d(Objet3d *pobj, uint32_t c, uint32_t s, int8_t ic, int8_t is){
+	uint8_t i;
+	uint32_t cy, sy, cz, sz;
+	int8_t iy, iz; // signe de y et z
+	uint8_t n = pobj->nb_sommets_1 + pobj->nb_sommets_2;
+	
+	for(i=0 ; i &lt; n ; i++){
+		if(bufferObj[i].y >= 0){
+			iy = +1;
+			/* // explicitement :
+			cy = ((uint32_t) bufferObj[i].y) &lt; 6; // devient à virgule fixe, 6bits après la virgule
+			sy = (s * cy) >> 6; // NE PAS OUBLIER POUR GARDER 6BITS APRES LA VIRGULE
+			cy = (c * cy) >> 6;
+			*/
+			// C'est equivalent a : (optimisation : pas la peine de shift 3 fois)
+			cy = (uint32_t) bufferObj[i].y; // virgule fixe, 0 bits après la virgule
+		} else {
+			iy = -1; // on sauvegarde le signe ailleurs
+			cy = (uint32_t) (-1*bufferObj[i].y); // devient non-signé pour pouvoir shift
+		}
+		sy = s * cy; // virgule fixe, 6 bits après la virgule
+		cy = c * cy;
+		
+		if(bufferObj[i].z >= 0){
+			iz = +1;
+			cz = (uint32_t) bufferObj[i].z;
+		} else {
+			iz = -1;
+			cz = (uint32_t) (-1*bufferObj[i].z);
+		}
+		sz = s * cz;
+		cz = c * cz;
+		
+		if(ic*iy >= 0){
+			if(-1*is*iz >= 0){
+				bufferObj[i].y = (cy+sz) >> 6;
+			} else {
+				if(cy >= sz){
+					bufferObj[i].y = (cy-sz) >> 6;
+				} else {
+					bufferObj[i].y = -1 * ((Coord3d)((sz-cy) >> 6));
+				}
+			}
+		} else {
+			if(-1*is*iz >= 0){
+				if(sz >= cy){
+					bufferObj[i].y = (sz-cy) >> 6;
+				} else {
+					bufferObj[i].y = -1 * ((Coord3d)((cy-sz) >> 6));
+				}
+			} else {
+				bufferObj[i].y = -1 * ((Coord3d)((cy+sz) >> 6));
+			}
+		}
+		
+		if(is*iy >= 0){
+			if(ic*iz >= 0){
+				bufferObj[i].z = (sy+cz) >> 6;
+			} else {
+				if(sy >= cz){
+					bufferObj[i].z = (sy-cz) >> 6;
+				} else {
+					bufferObj[i].z = -1 * ((Coord3d)((cz-sy) >> 6));
+				}
+			}
+		} else {
+			if(ic*iz >= 0){
+				if(cz >= sy){
+					bufferObj[i].z = (cz-sy) >> 6;
+				} else {
+					bufferObj[i].z = -1 * ((Coord3d)((sy-cz) >> 6));
+				}
+			} else {
+				bufferObj[i].z = -1 * ((Coord3d)((sy+cz) >> 6));
+			}
+		}
+	}
+}
+
+void tourner_Y_Objet3d(Objet3d *pobj, uint32_t c, uint32_t s, int8_t ic, int8_t is) {...}
+
+void tourner_Z_Objet3d(Objet3d *pobj, uint32_t c, uint32_t s, int8_t ic, int8_t is) {...}
+						</pre>
+						
+						<h4>Translation</h4>
+						<pre>
+void deplacer_Objet3d(Objet3d *pobj, Coord3d x, Coord3d y, Coord3d z){
+	uint8_t i;
+	uint8_t n = pobj->nb_sommets_1 + pobj->nb_sommets_2;
+	
+	for(i=0 ; i &lt; n ; i++){
+		bufferObj[i].x += x;
+		bufferObj[i].y += y;
+		bufferObj[i].z += z;
+	}
+}
+						</pre>
+						
+						<h4>Initialisation (clear) le buffer de profondeur des sommets</h4>
+						<pre>
+// Initialise le buffer de profondeur à 0
+// A chaque bit correspond un sommet du buffer d'objet
+// bit à 0 : sommet caché, bit à 1 : sommet visible
+void preparer_depth_buffer(void){
+	uint8_t i;
+	
+	for(i=0 ; i&lt;DEPTH_BUFFER_SIZE ; i++){
+		depthBuffer[i] = 0x00;
+	}
+}
+						</pre>
+						
+						<h4>Produit en croix pour le calcul de la normale d'une face (3 sommets, counter-clockwise)</h4>
+						<pre>
+// Calcule la normale d'une face (3 sommets).
+Point3d cross_product(Point3d A, Point3d B, Point3d C){
+	Coord3d x1 = B.x-A.x;
+	Coord3d y1 = B.y-A.y;
+	Coord3d z1 = B.z-A.z;
+	
+	Coord3d x2 = C.x-A.x;
+	Coord3d y2 = C.y-A.y;
+	Coord3d z2 = C.z-A.z;
+	
+	Point3d res;
+	res.x = y1*z2-z1*y2;
+	res.y = z1*x2-x1*z2;
+	res.z = x1*y2-y1*x2;
+	
+	return res; // copie
+}
+						</pre>
+						
+						<h4>Produit scalaire, mais seul son signe nous intéresse : si c'est négatif alors la face est visible</h4>
+						<pre>
+uint8_t dot_product_negatif(Point3d A, Point3d B){
+	// pour éviter les dépassements, 32bits insuffisant (ou diviser la normale avant)
+	int64_t res = (int64_t) A.x*B.x + A.y*B.y + A.z*B.z;
+	return res < 0;
+}
+						</pre>
+						
+						<h4>Détermine les sommets cachés et les sommets visibles.</h4>
+						<pre>
+// principe adapté de : https://www.phatcode.net/res/224/files/html/ch61/61-03.html
+void backface_culling(Objet3d *pobj){
+	uint8_t i; // suffisant car 136 max
+	Point3d normale;
+	
+	preparer_depth_buffer();
+	
+	for(i=0 ; i &lt; pobj->nb_faces_quad_1 ; i+=4){
+		// on ne teste que les 3 premiers sommets car on a fait en sorte que les faces quadrilateres soient dans des plans.
+		normale = cross_product(bufferObj[pobj->faces_quad_1[i]], bufferObj[pobj->faces_quad_1[i+1]], bufferObj[pobj->faces_quad_1[i+2]]);
+		
+		if(dot_product_negatif(normale, bufferObj[pobj->faces_quad_1[i]] )){
+			// i>>3 = i/8
+			// i &amp; 0x07 = i%8
+			
+			depthBuffer[pobj->faces_quad_1[i] >> 3]   |= 1 &lt; (pobj->faces_quad_1[i] &amp; 0x07);
+			depthBuffer[pobj->faces_quad_1[i+1] >> 3] |= 1 &lt; (pobj->faces_quad_1[i+1] &amp; 0x07);
+			depthBuffer[pobj->faces_quad_1[i+2] >> 3] |= 1 &lt; (pobj->faces_quad_1[i+2] &amp; 0x07);
+			depthBuffer[pobj->faces_quad_1[i+3] >> 3] |= 1 &lt; (pobj->faces_quad_1[i+3] &amp; 0x07);
+		}
+	}
+	
+	for(i=0 ; i &lt; pobj->nb_faces_quad_2 ; i+=4) {...}
+	
+	for(i=0 ; i &lt; pobj->nb_faces_tri_1 ; i+=3){
+		normale = cross_product(bufferObj[pobj->faces_tri_1[i]], bufferObj[pobj->faces_tri_1[i+1]], bufferObj[pobj->faces_tri_1[i+2]]);
+		if(dot_product_negatif(normale, bufferObj[pobj->faces_tri_1[i]] )){
+			depthBuffer[pobj->faces_tri_1[i] >> 3]   |= 1 &lt; (pobj->faces_tri_1[i] &amp; 0x07);
+			depthBuffer[pobj->faces_tri_1[i+1] >> 3] |= 1 &lt; (pobj->faces_tri_1[i+1] &amp; 0x07);
+			depthBuffer[pobj->faces_tri_1[i+2] >> 3] |= 1 &lt; (pobj->faces_tri_1[i+2] &amp; 0x07);
+		}
+	}
+	
+	for(i=0 ; i &lt; pobj->nb_faces_tri_2 ; i+=3)  {...}
+	
+}
+						</pre>
+						
+						<h4>Projection pour passer à des coordonnées 2D</h4>
+						<pre>
+void projeter_Objet3d(Objet3d *pobj){
+	uint8_t i;
+	uint8_t n = pobj->nb_sommets_1 + pobj->nb_sommets_2;
+	
+	for(i=0 ; i &lt; n ; i++){
+		// int32_t pour ne pas overflow : (si int16_t, limite -320 &lt;= x et y &lt;= 327 car ECRAN_PROJ_Z multiplie par 100
+		projection[i].x = LCD_HEIGHT/2 + ((int32_t)(ECRAN_PROJ_Z * bufferObj[i].x)) / bufferObj[i].z; // DIVISION ENTIERE
+		projection[i].y = LCD_WIDTH/2 + ((int32_t)(ECRAN_PROJ_Z * bufferObj[i].y)) / bufferObj[i].z;
+	}
+}
+						</pre>
+						
+						<h4>Dessin d'un modèle 3D</h4>
+						<pre>
+// Dessine les segments dont les deux sommets sont visibles
+void _dessiner(Objet3d *pobj, unsigned int couleur, Coord2d inverser){
+	uint8_t i; // suffisant car 182 max
+	
+	for(i=0 ; i &lt; pobj->nb_aretes_1 ; i+=2){
+		// Ne dessiner l'arete que si les deux sommets sont visibles.
+		if((depthBuffer[pobj->aretes_1[i]>>3] &amp; (1 &lt; (pobj->aretes_1[i] &amp; 0x07))) &amp;&amp; (depthBuffer[pobj->aretes_1[i+1]>>3] &amp; (1 &lt; (pobj->aretes_1[i+1] &amp; 0x07)))) {
+			dessiner_segment(projection[pobj->aretes_1[i]].x,   320*inverser + (1-2*inverser) * projection[pobj->aretes_1[i]].y,
+			                 projection[pobj->aretes_1[i+1]].x, 320*inverser + (1-2*inverser) * projection[pobj->aretes_1[i+1]].y,
+			                 couleur);
+		}
+	}
+	
+	for(i=0 ; i &lt; pobj->nb_aretes_2 ; i+=2) {...}
+}
+
+void dessiner_Objet3d(Objet3d *pobj, unsigned int couleur){
+	_dessiner(pobj, couleur, 0);
+}
+
+void dessiner_Objet3d_a_lenvers(Objet3d *pobj, unsigned int couleur){
+	_dessiner(pobj, couleur, 1);
+}
+						</pre>
+						
+						<h4>Affichage d'un modèle</h4>
+						<pre>
+Objet3d *pobj_current = &pion_3d;
+
+lcd_clear(Blue);
+
+charger_Objet3d(pobj_current);
+deplacer_Objet3d(pobj_current, 0, 0, 400);
+backface_culling(pobj_current);
+projeter_Objet3d(pobj_current);
+if (reverse_animation) // selon quel joueur doit voir la pièce à l'endroit
+	dessiner_Objet3d_a_lenvers(pobj_current, animation_color);
+else
+	dessiner_Objet3d(pobj_current, animation_color);
+						</pre>
+					</div>
+				</div>
+			</article>
+		</main>
+	</body>
+</html>

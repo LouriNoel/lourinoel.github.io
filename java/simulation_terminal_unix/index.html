@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Terminal Unix</title>
+		<meta charset="utf-8">
+		<base href="../../index.html"/>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+
+	<body>
+		<header>
+			<h1>Site de Louri Noël</h1>
+		</header>
+
+		<nav class="flex-list">
+			<ul>
+				<li><a href="index.html">Accueil</a></li>
+			</ul>
+		 </nav>
+
+		 <main>
+			<article>
+				<div class="article-body">
+					<div>
+						<h4>Introduction</h4>
+						<p>Ce projet a été l'occasion de suivre les méthodes agiles lors d'un projet avec une équipe de 5 personnes et de plus de 300 heures. Il a été fait en JavaFX en utilisant SceneBuilder, Intellij, Maven, Git et Trello.</p>
+						<p>L'application développée est un Escape Game : l'utilisateur doit réussir le challenge proposé afin de "sortir" du terminal en trouvant le mot de passe administrateur.
+						   Ces challenges ont pour objectif d'apprendre les commandes du système d'exploitation Linux à l'utilisateur.</p>
+							 
+						<p>L'éditeur de challenges permet de créer un challenge : spécifier un fil conducteur et un suivi de l'avancement du joueur (afin de mettre en place un scénario), restreindre les commandes autorisées, importer des ressources (sons, polices d'écriture)<br/>
+						   Le mode "Solo" permet de jouer à un challenge que l'on sélectionne.<br/>
+						   Le mode Multijoueur permet de créer/se connecter à un salon, d'y téléverser/télécharger un challenge et de le lancer en même temps chez tous les joueurs. Le score est ensuite transmis au serveur une fois le challenge complété par un joueur.</p>
+					
+						<p>Je me suis occupé du FXML, de l'aspect graphique du terminal, de la simulation de l'éditeur de fichiers Nano, et de la partie réseau de l'application.</p>
+						<p>Mes collègues se sont occupés entre autres de l'interpréteur de commandes et des commandes, des challenges et de l'implémentation simplifiée de Bash pour les diriger, et des tests unitaires.</p>
+					</div>
+					<div>
+						<h4>Aspect graphique du terminal</h4>
+						<p>Les composants JavaFX ne sont pas assez flexibles nativement pour reproduire complètement les options de coloration d'un terminal Unix. J'ai donc choisi d'utiliser la librairie RichTextFX. Les options de colorations étaient séparées en deux types, avec chacun une classe propre. J'ai dû fouiller et m'imprégner de la documentation afin de créer mon propre objet "fusionnant" les deux comportements possibles.</p>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/partie.PNG">
+							<figcaption>Aspect graphique du terminal, commandes disponibles</figcaption>
+						</figure>
+					</div>
+					<div>
+						<h4>Gestionnaire de menus</h4>
+						<p>Afin de pouvoir naviguer facilement entre les menus, j'ai développé un gestionnaire de menu : il suffisait alors basiquement de se déplacer vers un nouveau menu avec une méthode <i>push</i>, et de revenir en arrière avec une méthode <i>pop</i>.</p>
+						<p>La fenêtre est redimensionnable et les éléments FXML s'adaptent automatiquement à ses dimensions.</p>
+						<p>L'application possède des options d'affichage permettant notamment de choisir le thème et les couleurs utilisées. Contrairement aux autres groupes, le changement des paramètres d'affichage est dynamique : il n'y a pas besoin de relancer l'application, les changements se font directement. (chargement d'un fichier css créé dans un répertoire temporaire)</p>
+					</div>
+					<div>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/menu_principal.PNG" width="757">
+							<figcaption>Menu principal de l'application</figcaption>
+						</figure>
+					</div>
+					<div>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/popup_parametres.PNG" width="757">
+							<figcaption>Paramètres de l'application</figcaption>
+						</figure>
+					</div>
+					<div>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/menu_choix.PNG" width="757">
+							<figcaption>Choix d'un challenge à jouer ou à éditer</figcaption>
+						</figure>
+					</div>
+					<div>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/menu_jeu.PNG" width="757">
+							<figcaption>Menu du jeu</figcaption>
+						</figure>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/nano.PNG" width="757">
+							<figcaption>Nano</figcaption>
+						</figure>
+					</div>
+					<div>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/salon.PNG" width="757">
+							<figcaption>Salon d'attente multijoueur</figcaption>
+						</figure>
+					</div>
+					<div>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/menu_editeur.PNG" width="757">
+							<figcaption>Editeur ergonomique (il est aussi possible d'éditer un challenge au sein même du terminal)</figcaption>
+						</figure>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/menu_editeur_hierarchie.PNG">
+							<figcaption>avec hiérarchie de fichiers</figcaption>
+						</figure>
+						<figure>
+							<img src="java/simulation_terminal_unix/res/menu_editeur_fichier.PNG" width="757">
+							<figcaption>création ou édition d'un fichier</figcaption>
+						</figure>
+					</div>
+				</div>
+			</article>
+		</main>
+	</body>
+</html>
