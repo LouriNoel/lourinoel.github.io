@@ -3,8 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-# TODO : le bout d'escorte qui poursuit l'ennemi doit l'encercler -> toujours un comportement d'escorte avec des k différents
-
 DISTANCE_ATTRACTION = 90 # 90
 DISTANCE_ALIGNEMENT = 60 # 60
 DISTANCE_REPULSION = 55 # 55

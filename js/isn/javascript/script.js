@@ -495,11 +495,11 @@
      * Chargement de toutes les ressources du jeu.
      */
     loadState.preload = function () {
-        game.load.audio('musicIntro', 'https://media.githubusercontent.com/media/LouriNoel/lourinoel.github.io/main/js/isn/assets/audio/intro-Turrican2-the_final_fight-theme.mp3');
-        game.load.audio('musicLevel', 'https://media.githubusercontent.com/media/LouriNoel/lourinoel.github.io/main/js/isn/assets/audio/level-Turrican2-the_final_challenge.mp3');
-        game.load.audio('musicBoss', 'https://media.githubusercontent.com/media/LouriNoel/lourinoel.github.io/main/js/isn/assets/audio/boss-Turrican2-hi_GI_Joe!.mp3');
-        game.load.audio('button_click', 'https://media.githubusercontent.com/media/LouriNoel/lourinoel.github.io/main/js/isn/assets/audio/button_click.mp3');
-        game.load.audio('roar', 'https://media.githubusercontent.com/media/LouriNoel/lourinoel.github.io/main/js/isn/assets/audio/roar.mp3');
+		game.load.audio('musicIntro', 'assets/audio/intro-Turrican2-the_final_fight-theme.mp3');
+        game.load.audio('musicLevel', 'assets/audio/level-Turrican2-the_final_challenge.mp3');
+        game.load.audio('musicBoss', 'assets/audio/boss-Turrican2-hi_GI_Joe!.mp3');
+        game.load.audio('button_click', 'assets/audio/button_click.mp3');
+        game.load.audio('roar', 'assets/audio/roar.mp3');
 
         game.load.image('background', 'assets/textures/background.png');
         game.load.spritesheet('button', 'assets/textures/gui/button.png', 256, 64);// Paramètre 2 et 3 : dimensions d'une sous-image (ici un sprite).

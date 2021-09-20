@@ -27,7 +27,7 @@
 						<p>Un Boid est une entité définie ici comme une position et un rayon (pour donner un disque), ainsi qu'une direction.<br/>
 						   Trois forces s'appliquent entre les boids : une force d'attirance, de repoussement, et d'alignement. Elles sont définies par un rayon d'action et un coefficient (leur "puissance"). Le but est d'assurer une certaine cohésion de groupe sans pour autant bloquer les entités entre elles. La force d'alignement permet d'avoir un "déplacement de groupe" dans la même direction globale.</p>
 						<p>Le but est maintenant de créer une nuée qui va escorter une entité particulière d'un point A à un point B (seule cette entité connaît sa destination). Il faut alors l'entourer dans trop la gêner dans son trajet.</p>
-						<p>Mais des ennemis peuvent survenir, attirés par cette entité. Certains boids de l'escorte (mais pas tous) vont alors se détacher de l'escorte pour se rapprocher, entourer et enfin bloquer ces ennemis. Si l'ennemi se dresse entre l'entité escortée et le point B, il ne faut pas que cette entité et l'escorte soit bloquée : ils devront contourner l'ennemi bloqué.</p>
+						<p>Mais des ennemis peuvent survenir, attirés par cette entité. Certains boids de l'escorte (mais pas tous) vont alors se détacher de l'escorte pour se rapprocher, entourer et enfin bloquer ces ennemis. Si l'ennemi se dresse entre l'entité escortée et le point B, il ne faut pas que cette entité et l'escorte soient bloquées : elles devront contourner l'ennemi bloqué.</p>
 						<p>Toutes les interactions se font par l'application de forces. La subtilité provient du rayon d'action et de la puissance de celles-ci.</p>
 					</div>
 					<div>
@@ -38,9 +38,7 @@
 					</div>
 					<div>
 						<figure>
-							<video controls>
-								<source type="video/mp4" src="https://media.githubusercontent.com/media/LouriNoel/lourinoel.github.io/main/python/boids/res/escorte.mp4">
-							</video>
+							<iframe width="560" height="315" src="https://www.youtube.com/embed/hCBm9AK7V1k" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 							<figcaption>Escorte avec un ennemi venant de front.<br/>Dans l'ordre des rayons d'action croissants : force répulsive en rouge, d'alignement en vert et d'attirance en bleu.</figcaption>
 						</figure>
 					</div>
